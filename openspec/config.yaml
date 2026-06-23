@@ -1,0 +1,18 @@
+schema: spec-driven
+
+context: |
+  Platform: Android
+  Language: Kotlin
+  UI: Jetpack Compose + Canvas
+  Min SDK: 26 (Android 8.0)
+  Location: LocationManager (no GMS dependency)
+  Sensors: SensorManager (accelerometer + magnetometer)
+  State: StateFlow
+  Style: Dark dashboard (aviation + racing fusion)
+
+rules:
+  proposal:
+    - Include a "Non-goals" section
+    - Include visual layout diagrams
+  tasks:
+    - Break tasks into chunks of max 2 hours
