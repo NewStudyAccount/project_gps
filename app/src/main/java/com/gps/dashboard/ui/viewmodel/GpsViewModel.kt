@@ -102,7 +102,7 @@ class GpsViewModel(application: Application) : AndroidViewModel(application) {
         if (data.timestamp == 0L) "--:--:--"
         else {
             val sdf = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US)
-            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC+8")
             sdf.format(java.util.Date(data.timestamp))
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "--:--:--")

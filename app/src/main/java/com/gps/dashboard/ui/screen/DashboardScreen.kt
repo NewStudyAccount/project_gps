@@ -125,12 +125,12 @@ fun DashboardScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             DataCard(
-                label = "LATITUDE",
+                label = "纬度",
                 value = formattedLatitude,
                 modifier = Modifier.weight(1f),
             )
             DataCard(
-                label = "LONGITUDE",
+                label = "经度",
                 value = formattedLongitude,
                 modifier = Modifier.weight(1f),
             )
@@ -144,13 +144,13 @@ fun DashboardScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             DataCard(
-                label = "ALTITUDE",
+                label = "海拔",
                 value = altitudeText,
                 unit = "m",
                 modifier = Modifier.weight(1f),
             )
             DataCard(
-                label = "SPEED",
+                label = "速度",
                 value = "%.1f".format(gpsData.speed * speedUnit.factor),
                 modifier = Modifier.weight(1f),
                 extraContent = {
@@ -171,7 +171,7 @@ fun DashboardScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             DataCard(
-                label = "ACCURACY",
+                label = "精度",
                 value = "± ${"%.1f".format(gpsData.accuracy)}",
                 unit = "m",
                 modifier = Modifier.weight(1f),
@@ -242,7 +242,7 @@ private fun TopBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "◉ GPS DASHBOARD",
+            text = "◉ GPS 仪表盘",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = Primary,
@@ -280,7 +280,7 @@ private fun BottomMeta(
             .padding(12.dp)
     ) {
         Text(
-            text = "UTC $utcTime",
+            text = "UTC+8 $utcTime",
             fontSize = 12.sp,
             color = TextPrimary,
             fontFamily = MonoFontFamily,
@@ -315,7 +315,7 @@ private fun PermissionScreen(
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "GPS Dashboard",
+            text = "GPS 仪表盘",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = TextPrimary,
