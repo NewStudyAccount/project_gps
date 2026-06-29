@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps.dashboard.data.buffer.RingBuffer
+import com.gps.dashboard.data.location.LocationStateHolder
 import com.gps.dashboard.data.model.*
-import com.gps.dashboard.data.repository.LocationRepository
 import com.gps.dashboard.data.repository.SatelliteRepository
 import com.gps.dashboard.data.repository.SensorRepository
 import com.gps.dashboard.util.AccuracyEvaluator
@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 
 class GpsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val locationRepo = LocationRepository(application)
     private val sensorRepo = SensorRepository(application)
     private val satelliteRepo = SatelliteRepository(application)
 
@@ -136,7 +135,7 @@ class GpsViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun startLocationCollection() {
         viewModelScope.launch {
-            locationRepo.locationFlow.collect { location ->
+            LocationStateHolder.location.filterNotNull().collect { location ->
                 sensorRepo.updateLocationForDeclination(
                     location.latitude, location.longitude, location.altitude
                 )

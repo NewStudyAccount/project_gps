@@ -24,15 +24,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gps.dashboard.GpsApplication
+import com.gps.dashboard.data.location.LocationStateHolder
+import com.gps.dashboard.data.recorder.TrackRecorder
 import com.gps.dashboard.ui.component.*
 import com.gps.dashboard.ui.theme.*
 import com.gps.dashboard.ui.viewmodel.GpsViewModel
+import com.gps.dashboard.ui.viewmodel.TrackingViewModel
 import com.gps.dashboard.util.AccuracyLevel
 import androidx.compose.foundation.clickable
 
 @Composable
 fun DashboardScreen(
     viewModel: GpsViewModel = viewModel(),
+    trackingViewModel: TrackingViewModel = viewModel(),
+    onNavigateToTrackList: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
@@ -50,6 +56,16 @@ fun DashboardScreen(
     LaunchedEffect(Unit) {
         val fine = context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
         viewModel.onPermissionResult(fine == android.content.pm.PackageManager.PERMISSION_GRANTED)
+    }
+
+    // 权限就绪时启动后台定位 Service
+    LaunchedEffect(permissionGranted) {
+        if (permissionGranted) {
+            val app = context.applicationContext as GpsApplication
+            if (!LocationStateHolder.isServiceRunning.value) {
+                app.startLocationService()
+            }
+        }
     }
 
     if (!permissionGranted) {
@@ -71,6 +87,12 @@ fun DashboardScreen(
         )
         return
     }
+
+    // 收集录制状态
+    val recordingState by trackingViewModel.recordingState.collectAsState()
+    val trackStats by trackingViewModel.trackStats.collectAsState()
+    val isRecording = recordingState == TrackRecorder.State.RECORDING
+    val isPaused = recordingState == TrackRecorder.State.PAUSED
 
     // 收集状态
     val gpsData by viewModel.gpsData.collectAsState()
@@ -214,6 +236,76 @@ fun DashboardScreen(
             constellationStats = constellationStats,
             onToggle = { viewModel.toggleSatellitePanel() },
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 录制状态条 (仅录制时显示)
+        if (isRecording || isPaused) {
+            RecordingBar(
+                stats = trackStats,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // 操作按钮
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            // 录制按钮
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (isRecording) StatusBad else Surface)
+                    .border(
+                        1.dp,
+                        if (isRecording) StatusBad else Border,
+                        RoundedCornerShape(8.dp)
+                    )
+                    .clickable {
+                        when (recordingState) {
+                            TrackRecorder.State.IDLE -> trackingViewModel.startRecording()
+                            TrackRecorder.State.RECORDING -> trackingViewModel.stopRecording()
+                            TrackRecorder.State.PAUSED -> trackingViewModel.stopRecording()
+                        }
+                    }
+                    .padding(vertical = 12.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = when (recordingState) {
+                        TrackRecorder.State.IDLE -> "● 开始录制"
+                        TrackRecorder.State.RECORDING -> "■ 停止录制"
+                        TrackRecorder.State.PAUSED -> "■ 停止录制"
+                    },
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isRecording) Background else Primary,
+                    fontFamily = MonoFontFamily,
+                )
+            }
+
+            // 历史轨迹按钮
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Surface)
+                    .border(1.dp, Border, RoundedCornerShape(8.dp))
+                    .clickable { onNavigateToTrackList() }
+                    .padding(vertical = 12.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "📋 历史轨迹",
+                    fontSize = 14.sp,
+                    color = TextPrimary,
+                    fontFamily = MonoFontFamily,
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
