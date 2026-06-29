@@ -80,6 +80,10 @@ class GpsViewModel(application: Application) : AndroidViewModel(application) {
         list.filter { it.inUse }.groupBy { it.constellation }.mapValues { it.value.size }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
+    val constellationTotalStats: StateFlow<Map<Constellation, Int>> = satellites.map { list ->
+        list.groupBy { it.constellation }.mapValues { it.value.size }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
+
     val averageCn0: StateFlow<Float> = satellites.map { list ->
         val inUse = list.filter { it.inUse }
         if (inUse.isEmpty()) 0f else inUse.map { it.cn0 }.average().toFloat()
@@ -101,7 +105,7 @@ class GpsViewModel(application: Application) : AndroidViewModel(application) {
         if (data.timestamp == 0L) "--:--:--"
         else {
             val sdf = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US)
-            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC+8")
+            sdf.timeZone = java.util.TimeZone.getTimeZone("Asia/Shanghai")
             sdf.format(java.util.Date(data.timestamp))
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "--:--:--")

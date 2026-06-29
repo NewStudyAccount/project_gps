@@ -107,6 +107,7 @@ fun DashboardScreen(
     val accuracyRatio by viewModel.accuracyRatio.collectAsState()
     val satelliteInUseCount by viewModel.satelliteInUseCount.collectAsState()
     val constellationStats by viewModel.constellationStats.collectAsState()
+    val constellationTotalStats by viewModel.constellationTotalStats.collectAsState()
     val averageCn0 by viewModel.averageCn0.collectAsState()
     val fixTypeText by viewModel.fixTypeText.collectAsState()
     val providerText by viewModel.providerText.collectAsState()
@@ -234,6 +235,7 @@ fun DashboardScreen(
             inUseCount = satelliteInUseCount,
             averageCn0 = averageCn0,
             constellationStats = constellationStats,
+            constellationTotalStats = constellationTotalStats,
             onToggle = { viewModel.toggleSatellitePanel() },
         )
 
